@@ -1,0 +1,18 @@
+<layout>
+    <com.jmrp.calendar.CalendarMonth
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/rlContainerMonth"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#DE56FF">
+
+        <TextView
+            android:id="@+id/tvTest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:layout_centerInParent="true"
+            android:textSize="48sp"
+            android:text="1002"/>
+    </com.jmrp.calendar.CalendarMonth>
+</layout>
