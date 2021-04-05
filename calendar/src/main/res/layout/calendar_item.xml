@@ -1,0 +1,14 @@
+<com.jmrp.calendar.CalendarItemView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rlMonthContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="20dp">
+
+    <com.jmrp.calendar.CalendarMonthView
+        android:id="@+id/gvContainerMonth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numColumns="7" />
+
+</com.jmrp.calendar.CalendarItemView>

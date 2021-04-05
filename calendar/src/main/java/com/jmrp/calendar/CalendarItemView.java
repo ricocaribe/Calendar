@@ -1,90 +1,45 @@
 package com.jmrp.calendar;
 
 import android.content.Context;
-import android.os.Bundle;
+import android.graphics.Color;
+import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-
-import com.jmrp.calendar.databinding.CalendarMonthBinding;
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Locale;
+import java.util.Random;
 
-public class CalendarItemView extends Fragment {
-
-    /**
-     * Calendar argument key
-     */
-    public static final String CALENDAR_KEY = "calendar";
+public class CalendarItemView extends RelativeLayout {
 
     public static final String TAG = "CalendarFragmentView";
 
-    private CalendarMonthBinding calendarMonthBinding;
-
     private Calendar mCalendar;
 
-    private Context mContext;
-
-    public static CalendarItemView newInstance(Calendar calendar) {
-        CalendarItemView calendarItemView = new CalendarItemView();
-        Bundle args = new Bundle();
-        args.putSerializable(CALENDAR_KEY, calendar);
-        calendarItemView.setArguments(args);
-        return calendarItemView;
+    public CalendarItemView(Context context) {
+        super(context);
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    public CalendarItemView(Context context, AttributeSet attrs) {
+        super(context, attrs);
     }
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        mContext = context;
+    public CalendarItemView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
     }
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        calendarMonthBinding = DataBindingUtil.inflate(inflater, R.layout.calendar_month, container, false);
+    public void init(Calendar calendar){
+        Random rnd = new Random();
+        int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+        setBackgroundColor(color);
 
-        if(getArguments()!=null){
-            mCalendar = (Calendar) getArguments().get(CALENDAR_KEY);
-            setUpCalendar();
-        }
-
-        return calendarMonthBinding.getRoot();
-
+        mCalendar = calendar;
     }
-
-
-
-    @Override
-    public void setMenuVisibility(final boolean visible) {
-        if (visible) {
-            //Do your stuff here
-        }
-
-        super.setMenuVisibility(visible);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
     /**
      * Set up calendar
      */
-    public void setUpCalendar() {
+    /*public void setUpCalendar() {
 
         Log.d(TAG, "setUpCalendar: ");
 
@@ -104,7 +59,7 @@ public class CalendarItemView extends Fragment {
 
         CalendarDay calendarDay;
 
-        Log.d(TAG, "setUpCalendar: Calendar month: " + mCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, mContext.getResources().getConfiguration().locale));
+        Log.d(TAG, "setUpCalendar: Calendar month: " + mCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, getResources().getConfiguration().locale));
 
         for(int i = 0;i<monthMaxDays;i++){
             calendarDay = CalendarDay.from(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH));
@@ -112,11 +67,10 @@ public class CalendarItemView extends Fragment {
             mCalendar.add(Calendar.DAY_OF_MONTH, 1);
         }
 
-        //Create an object of CustomAdapter and set Adapter to GridView
-        CalendarDayAdapter customAdapter = new CalendarDayAdapter(mContext, calendarDays);
-        calendarMonthBinding.gvContainerMonth.setAdapter(customAdapter);
+        CalendarMonthView calendarMonthView = findViewById(R.id.gvContainerMonth);
+        calendarMonthView.setAdapter(new CalendarDayAdapter(getContext(), calendarDays));
 
-        //Implement setOnItemClickListener event on GridView
-        calendarMonthBinding.gvContainerMonth.setOnItemClickListener((parent, view, position, id) -> Log.d(TAG, "onItemClick: " + position));
-    }
+        //Create an object of CustomAdapter and set Adapter to GridView
+        calendarMonthView.setOnItemClickListener((parent, view, position, id) -> Log.d(TAG, "onItemClick: " + position));
+    }*/
 }

@@ -64,9 +64,8 @@
             android:padding="2dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_expand_more"
-            app:tint="@android:color/holo_red_dark"
-            android:scaleType="centerInside"
+            android:background="@drawable/ic_expand_more"
+            android:backgroundTint="@android:color/holo_red_dark"
             tools:ignore="ContentDescription" />
     </RelativeLayout>
 
