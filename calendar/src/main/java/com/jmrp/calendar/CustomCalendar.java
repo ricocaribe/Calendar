@@ -10,8 +10,8 @@ import java.lang.ref.WeakReference;
 /**
  * The type Directory.
  */
-final public class Calendar {
-    private static Calendar mInstance;
+final public class CustomCalendar {
+    private static CustomCalendar mInstance;
 
     private final String TAG = getClass().getSimpleName();
     private CalendarColourResources mColourRes;
@@ -30,9 +30,9 @@ final public class Calendar {
      * @param context the context
      * @return the instance
      */
-    public static Calendar getInstance(Context context) {
+    public static CustomCalendar getInstance(Context context) {
         if (mInstance == null)
-            mInstance = new Calendar();
+            mInstance = new CustomCalendar();
 
         mInstance.mContext = new WeakReference<>(context);
 
@@ -42,7 +42,7 @@ final public class Calendar {
     /**
      * Directory Constructor
      */
-    public Calendar() {
+    public CustomCalendar() {
         mBaseInterface = new CalendarBaseInterface() {
             @Override
             public CalendarBaseInterface configureCalendar(CalendarBaseInterface calendarBaseInterface) {

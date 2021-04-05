@@ -2,11 +2,11 @@ package com.jmrp.calendar;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewpager.widget.ViewPager;
-import androidx.viewpager2.widget.ViewPager2;
 
 public class CalendarViewPager extends ViewPager {
     public CalendarViewPager(@NonNull Context context) {
@@ -15,5 +15,29 @@ public class CalendarViewPager extends ViewPager {
 
     public CalendarViewPager(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int height = 0;
+        int childWidthSpec = MeasureSpec.makeMeasureSpec(
+                Math.max(0, MeasureSpec.getSize(widthMeasureSpec) -
+                        getPaddingLeft() - getPaddingRight()),
+                MeasureSpec.getMode(widthMeasureSpec)
+        );
+        for (int i = 0; i < getChildCount(); i++) {
+            View child = getChildAt(i);
+            child.measure(childWidthSpec, MeasureSpec.UNSPECIFIED);
+            int h = child.getMeasuredHeight();
+            if (h > height) height = h;
+        }
+
+        if (height != 0) {
+            heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
+        }
+
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 }

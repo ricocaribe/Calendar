@@ -1,0 +1,17 @@
+<layout xmlns:tools="http://schemas.android.com/tools">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/rlDayContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <CheckedTextView
+            android:id="@+id/tvCalendarDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            tools:text="99" />
+
+    </RelativeLayout>
+</layout>
