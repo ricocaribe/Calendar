@@ -119,13 +119,13 @@ public class CalendarBaseView extends RelativeLayout {
      */
     private void setUpViewPager(Context context) {
 
-        ArrayList<View> mCalendarItemViews = new ArrayList<>();
+        ArrayList<CalendarItemView> mCalendarItemViews = new ArrayList<>();
 
         mCalendarItemViews.add(new CalendarItemView(getContext()));
-        //mCalendarItemViews.add(new CalendarItemView(getContext()));
-        //mCalendarItemViews.add(new CalendarItemView(getContext()));
+        mCalendarItemViews.add(new CalendarItemView(getContext()));
+        mCalendarItemViews.add(new CalendarItemView(getContext()));
 
-        mCalendarPagerAdapter = new CalendarPagerAdapter(mCalendarItemViews, mCalendar);
+        mCalendarPagerAdapter = new CalendarPagerAdapter(mCalendarItemViews);
 
         //Pager animation for alpha effect
         viewPagerCalendar.setPageTransformer(false, (page, position) -> {
@@ -136,54 +136,11 @@ public class CalendarBaseView extends RelativeLayout {
         viewPagerCalendar.setAdapter(mCalendarPagerAdapter);
 
         //Selects middle item
-        viewPagerCalendar.setCurrentItem(0);
+        viewPagerCalendar.setCurrentItem(1);
 
-        viewPagerCalendar.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        viewPagerCalendar.addOnPageChangeListener(mOnPageChangeListener);
 
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                Log.d(TAG, "onPageScrolled: " + position);
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-
-                Log.d(TAG, "onPageSelected: " + position);
-                //init month with month days
-                if (position == 0) {
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateCalendar(false);
-                            CalendarItemView calendarItemView = new CalendarItemView(getContext());
-                            mCalendarPagerAdapter.addView(calendarItemView, 0);
-                        }
-                    }, 100);
-
-
-                } else if (position == mCalendarPagerAdapter.getCount() - 1) {
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateCalendar(true);
-                            CalendarItemView calendarItemView = new CalendarItemView(getContext());
-                            mCalendarPagerAdapter.addView(calendarItemView, position+1);
-
-                        }
-                    }, 100);
-                } else updateCalendar(mCuerrentPosition < position);
-
-                mCuerrentPosition = position;
-
-                Log.d(TAG, "setUpViewPager: month: " + mCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, getResources().getConfiguration().locale));
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                Log.d(TAG, "onPageScrollStateChanged: " + state);
-            }
-        });
+        mOnPageChangeListener.onPageSelected(viewPagerCalendar.getCurrentItem());
     }
 
     /**
@@ -214,7 +171,7 @@ public class CalendarBaseView extends RelativeLayout {
                 mCalendar.set(Calendar.YEAR, mCalendar.get(Calendar.YEAR) + 1);
                 mCurrentYear = mCalendar.get(Calendar.YEAR);
             } else {
-                mCalendar.set(Calendar.MONTH, mCalendar.get(Calendar.MONTH) + 1);
+                mCalendar.set(Calendar.MONTH, mCurrentMonth + 1);
                 mCurrentMonth = mCalendar.get(Calendar.MONTH);
             }
         } else {
@@ -226,21 +183,74 @@ public class CalendarBaseView extends RelativeLayout {
                 mCalendar.set(Calendar.YEAR, mCalendar.get(Calendar.YEAR) - 1);
                 mCurrentYear = mCalendar.get(Calendar.YEAR);
             } else {
-                mCalendar.set(Calendar.MONTH, mCalendar.get(Calendar.MONTH) - 1);
+                mCalendar.set(Calendar.MONTH, mCurrentMonth - 1);
                 mCurrentMonth = mCalendar.get(Calendar.MONTH);
             }
         }
 
         Log.d(TAG, "updateCalendar: Current Month updated -> " + mCurrentMonth);
         Log.d(TAG, "updateCalendar: Current Year updated -> " + mCurrentYear);
-/*
-        mCalendar.set(Calendar.MONTH, mCurrentMonth);
-        mCalendar.set(Calendar.YEAR, mCurrentYear);*/
 
         tvCalendarMonth.setText(mCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, getResources().getConfiguration().locale));
         tvCalendarYear.setText(String.valueOf(mCalendar.get(Calendar.YEAR)));
-
-        /*tvCalendarMonth.setText(mCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, getResources().getConfiguration().locale));
-        tvCalendarYear.setText(String.valueOf(mCalendar.get(Calendar.YEAR)));*/
     }
+
+    private final ViewPager.OnPageChangeListener mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            Log.d(TAG, "onPageScrolled: " + position);
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+
+
+            Log.d(TAG, "onPageSelected: " + position);
+            //init month with month days
+            if (position == 0) {
+                /*new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateCalendar(false);
+                        CalendarItemView calendarItemView = new CalendarItemView(getContext());
+                        calendarItemView.setUpCalendar(mCalendar);
+                        mCalendarPagerAdapter.addView(calendarItemView, 0);
+                    }
+                }, 100);*/
+                updateCalendar(false);
+                /*CalendarItemView calendarItemView = new CalendarItemView(getContext());
+                calendarItemView.setUpCalendar(mCalendar);
+                mCalendarPagerAdapter.addView(calendarItemView, 0);*/
+
+            } else if (position == mCalendarPagerAdapter.getCount() - 1) {
+                /*new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateCalendar(true);
+                        CalendarItemView calendarItemView = new CalendarItemView(getContext());
+                        calendarItemView.setUpCalendar(mCalendar);
+                        mCalendarPagerAdapter.addView(calendarItemView, position+1);
+
+                    }
+                }, 100);*/
+
+                updateCalendar(true);
+                /*CalendarItemView calendarItemView = new CalendarItemView(getContext());
+                calendarItemView.setUpCalendar(mCalendar);
+                mCalendarPagerAdapter.addView(calendarItemView, position+1);*/
+            } else{
+                ((CalendarItemView)mCalendarPagerAdapter.getView(position)).setUpCalendar(mCalendar);
+            }
+
+            mCuerrentPosition = position;
+
+            Log.d(TAG, "setUpViewPager: month: " + mCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, getResources().getConfiguration().locale));
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+            Log.d(TAG, "onPageScrollStateChanged: " + state);
+        }
+    };
 }

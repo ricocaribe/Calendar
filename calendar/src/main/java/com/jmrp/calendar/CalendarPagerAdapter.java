@@ -16,15 +16,15 @@ import java.util.Random;
 
 public class CalendarPagerAdapter extends PagerAdapter {
     // This holds all the currently displayable views, in order from left to right.
-    private ArrayList<View> mCalendarItemViews = new ArrayList<>();
+    private ArrayList<CalendarItemView> mCalendarItemViews;
 
     public static final String TAG = "CalendarPagerAdapter";
 
     private Calendar mCalendar;
 
-    public CalendarPagerAdapter(ArrayList<View> mCalendarItemViews, Calendar calendar) {
+    public CalendarPagerAdapter(ArrayList<CalendarItemView> mCalendarItemViews) {
         this.mCalendarItemViews = mCalendarItemViews;
-        this.mCalendar = calendar;
+        //this.mCalendar = calendar;
     }
 
     //-----------------------------------------------------------------------------
@@ -47,14 +47,12 @@ public class CalendarPagerAdapter extends PagerAdapter {
     // all our pages are persistent, we simply retrieve it from our "views" ArrayList.
     @Override
     public Object instantiateItem (ViewGroup container, int position) {
-        LayoutInflater inflater = LayoutInflater.from(container.getContext());
-        CalendarItemView v = (CalendarItemView) inflater.inflate(R.layout.calendar_item, container, false);
+        //LayoutInflater inflater = LayoutInflater.from(container.getContext());
+        //CalendarItemView v = (CalendarItemView) inflater.inflate(R.layout.calendar_item, container, false);
 
-        //CalendarItemView v = (CalendarItemView) mCalendarItemViews.get (position);
+        CalendarItemView v = (CalendarItemView) mCalendarItemViews.get (position);
 
-        v.init(mCalendar);
-        v.setUpCalendar();
-
+        //v.init();
 
         if(v.getParent() != null) {
             ((ViewGroup)v.getParent()).removeView(v); // <- fix
@@ -97,7 +95,7 @@ public class CalendarPagerAdapter extends PagerAdapter {
     // Add "view" to right end of "views".
     // Returns the position of the new view.
     // The app should call this to add pages; not used by ViewPager.
-    public int addView (View v)
+    public int addView (CalendarItemView v)
     {
         return addView (v, mCalendarItemViews.size());
     }
@@ -106,7 +104,7 @@ public class CalendarPagerAdapter extends PagerAdapter {
     // Add "view" at "position" to "views".
     // Returns position of new view.
     // The app should call this to add pages; not used by ViewPager.
-    public int addView (View v, int position)
+    public int addView (CalendarItemView v, int position)
     {
         mCalendarItemViews.add (position, v);
         notifyDataSetChanged();

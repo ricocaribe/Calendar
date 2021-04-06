@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
@@ -18,35 +19,47 @@ public class CalendarItemView extends RelativeLayout {
 
     public static final String TAG = "CalendarFragmentView";
 
-    private Calendar mCalendar;
+    private CalendarItemView rlMonthContainer;
+    private CalendarMonthView gvContainerMonth;
+    private Context mContext;
 
     public CalendarItemView(Context context) {
         super(context);
+        mContext = context;
     }
 
     public CalendarItemView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
     }
 
     public CalendarItemView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mContext = context;
     }
 
-    public void init(Calendar calendar){
+    public void init(){
         Random rnd = new Random();
         int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
         setBackgroundColor(color);
+    }
 
-        mCalendar = calendar;
+    public void initViews(Context context){
+        //Inflate and attach your child XML
+        LayoutInflater.from(context).inflate(R.layout.calendar_item, this);
+        //Get a reference to the layout where you want children to be placed
+        gvContainerMonth = findViewById(R.id.gvContainerMonth);
     }
 
     /**
      * Set up calendar
      */
-    public void setUpCalendar() {
+    public void setUpCalendar(Calendar mCalendar) {
 
-        mCalendar.set(Calendar.MONTH, 7);
-        mCalendar.set(Calendar.DAY_OF_MONTH, 22);
+        //Inflate and attach your child XML
+        LayoutInflater.from(mContext).inflate(R.layout.calendar_item, this);
+        //Get a reference to the layout where you want children to be placed
+        gvContainerMonth = findViewById(R.id.gvContainerMonth);
 
         //Log.d(TAG, "setUpCalendar: Current calendar month: " + mCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, getResources().getConfiguration().locale));
 
@@ -100,10 +113,10 @@ public class CalendarItemView extends RelativeLayout {
         }
 
         //Sets month adapter
-        CalendarMonthView calendarMonthView = findViewById(R.id.gvContainerMonth);
-        calendarMonthView.setAdapter(new CalendarDayAdapter(getContext(), calendarDays));
+        //CalendarMonthView calendarMonthView = findViewById(R.id.gvContainerMonth);
+        gvContainerMonth.setAdapter(new CalendarDayAdapter(getContext(), calendarDays));
 
         //Sets click listener for each day in adapter and manage its  events
-        calendarMonthView.setOnItemClickListener((parent, view, position, id) -> Log.d(TAG, "onItemClick -> " + position));
+        gvContainerMonth.setOnItemClickListener((parent, view, position, id) -> Log.d(TAG, "onItemClick -> " + position));
     }
 }
