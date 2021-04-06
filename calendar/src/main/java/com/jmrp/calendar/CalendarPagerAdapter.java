@@ -53,7 +53,8 @@ public class CalendarPagerAdapter extends PagerAdapter {
         //CalendarItemView v = (CalendarItemView) mCalendarItemViews.get (position);
 
         v.init(mCalendar);
-        //v.setUpCalendar();
+        v.setUpCalendar();
+
 
         if(v.getParent() != null) {
             ((ViewGroup)v.getParent()).removeView(v); // <- fix

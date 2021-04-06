@@ -120,12 +120,12 @@ public class CalendarBaseView extends RelativeLayout {
     private void setUpViewPager(Context context) {
 
         ArrayList<View> mCalendarItemViews = new ArrayList<>();
+
         mCalendarItemViews.add(new CalendarItemView(getContext()));
-        mCalendarItemViews.add(new CalendarItemView(getContext()));
-        mCalendarItemViews.add(new CalendarItemView(getContext()));
+        //mCalendarItemViews.add(new CalendarItemView(getContext()));
+        //mCalendarItemViews.add(new CalendarItemView(getContext()));
 
         mCalendarPagerAdapter = new CalendarPagerAdapter(mCalendarItemViews, mCalendar);
-
 
         //Pager animation for alpha effect
         viewPagerCalendar.setPageTransformer(false, (page, position) -> {
@@ -136,7 +136,7 @@ public class CalendarBaseView extends RelativeLayout {
         viewPagerCalendar.setAdapter(mCalendarPagerAdapter);
 
         //Selects middle item
-        viewPagerCalendar.setCurrentItem(1);
+        viewPagerCalendar.setCurrentItem(0);
 
         viewPagerCalendar.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
@@ -155,8 +155,9 @@ public class CalendarBaseView extends RelativeLayout {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            mCalendarPagerAdapter.addView(new CalendarItemView(getContext()), 0);
                             updateCalendar(false);
+                            CalendarItemView calendarItemView = new CalendarItemView(getContext());
+                            mCalendarPagerAdapter.addView(calendarItemView, 0);
                         }
                     }, 100);
 
@@ -165,8 +166,9 @@ public class CalendarBaseView extends RelativeLayout {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            mCalendarPagerAdapter.addView(new CalendarItemView(getContext()), position + 1);
                             updateCalendar(true);
+                            CalendarItemView calendarItemView = new CalendarItemView(getContext());
+                            mCalendarPagerAdapter.addView(calendarItemView, position+1);
 
                         }
                     }, 100);
