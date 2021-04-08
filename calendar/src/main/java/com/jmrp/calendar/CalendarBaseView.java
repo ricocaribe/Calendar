@@ -9,10 +9,13 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import static com.jmrp.calendar.CalendarItemView.CALENDAR_KEY;
 
 public class CalendarBaseView extends RelativeLayout {
 
@@ -55,7 +58,7 @@ public class CalendarBaseView extends RelativeLayout {
     /**
      * The current pager position
      */
-    private int mCuerrentPosition;
+    private int mCurrentPosition;
 
     /**
      * The calendar constructor
@@ -119,13 +122,7 @@ public class CalendarBaseView extends RelativeLayout {
      */
     private void setUpViewPager(Context context) {
 
-        ArrayList<CalendarItemView> mCalendarItemViews = new ArrayList<>();
-
-        mCalendarItemViews.add(new CalendarItemView(getContext()));
-        mCalendarItemViews.add(new CalendarItemView(getContext()));
-        mCalendarItemViews.add(new CalendarItemView(getContext()));
-
-        mCalendarPagerAdapter = new CalendarPagerAdapter(mCalendarItemViews);
+        mCalendarPagerAdapter = new CalendarPagerAdapter(((AppCompatActivity) getContext()).getSupportFragmentManager(), mCalendar);
 
         //Pager animation for alpha effect
         viewPagerCalendar.setPageTransformer(false, (page, position) -> {
@@ -136,11 +133,12 @@ public class CalendarBaseView extends RelativeLayout {
         viewPagerCalendar.setAdapter(mCalendarPagerAdapter);
 
         //Selects middle item
-        viewPagerCalendar.setCurrentItem(1);
+        mCurrentPosition = Integer.MAX_VALUE/2;
+        viewPagerCalendar.setCurrentItem(mCurrentPosition);
 
         viewPagerCalendar.addOnPageChangeListener(mOnPageChangeListener);
 
-        mOnPageChangeListener.onPageSelected(viewPagerCalendar.getCurrentItem());
+        //mOnPageChangeListener.onPageSelected(viewPagerCalendar.getCurrentItem());
     }
 
     /**
@@ -157,13 +155,12 @@ public class CalendarBaseView extends RelativeLayout {
     /**
      * Update calendar header, month and year
      */
-    private void updateCalendar(boolean increase) {
+    private void updateCalendar(Calendar calendar) {
 
-        Log.d(TAG, "updateCalendar: ");
-        Log.d(TAG, "updateCalendar: Current Month -> " + mCurrentMonth);
-        Log.d(TAG, "updateCalendar: Current Year -> " + mCurrentYear);
+        Log.d(TAG, "updateCalendar: month: " + calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, getResources().getConfiguration().locale));
 
-        if (increase) {
+
+        /*if (increase) {
             if (mCurrentMonth == 11) {
                 mCurrentMonth = 0;
                 mCalendar.set(Calendar.MONTH, mCurrentMonth);
@@ -189,10 +186,10 @@ public class CalendarBaseView extends RelativeLayout {
         }
 
         Log.d(TAG, "updateCalendar: Current Month updated -> " + mCurrentMonth);
-        Log.d(TAG, "updateCalendar: Current Year updated -> " + mCurrentYear);
+        Log.d(TAG, "updateCalendar: Current Year updated -> " + mCurrentYear);*/
 
-        tvCalendarMonth.setText(mCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, getResources().getConfiguration().locale));
-        tvCalendarYear.setText(String.valueOf(mCalendar.get(Calendar.YEAR)));
+        tvCalendarMonth.setText(calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, getResources().getConfiguration().locale));
+        tvCalendarYear.setText(String.valueOf(calendar.get(Calendar.YEAR)));
     }
 
     private final ViewPager.OnPageChangeListener mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
@@ -205,47 +202,19 @@ public class CalendarBaseView extends RelativeLayout {
         @Override
         public void onPageSelected(int position) {
 
-
-            Log.d(TAG, "onPageSelected: " + position);
-            //init month with month days
-            if (position == 0) {
-                /*new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateCalendar(false);
-                        CalendarItemView calendarItemView = new CalendarItemView(getContext());
-                        calendarItemView.setUpCalendar(mCalendar);
-                        mCalendarPagerAdapter.addView(calendarItemView, 0);
-                    }
-                }, 100);*/
-                updateCalendar(false);
-                /*CalendarItemView calendarItemView = new CalendarItemView(getContext());
-                calendarItemView.setUpCalendar(mCalendar);
-                mCalendarPagerAdapter.addView(calendarItemView, 0);*/
-
-            } else if (position == mCalendarPagerAdapter.getCount() - 1) {
-                /*new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateCalendar(true);
-                        CalendarItemView calendarItemView = new CalendarItemView(getContext());
-                        calendarItemView.setUpCalendar(mCalendar);
-                        mCalendarPagerAdapter.addView(calendarItemView, position+1);
-
-                    }
-                }, 100);*/
-
+            /*if(mCurrentPosition<position){
+                //Show next month
                 updateCalendar(true);
-                /*CalendarItemView calendarItemView = new CalendarItemView(getContext());
-                calendarItemView.setUpCalendar(mCalendar);
-                mCalendarPagerAdapter.addView(calendarItemView, position+1);*/
-            } else{
-                ((CalendarItemView)mCalendarPagerAdapter.getView(position)).setUpCalendar(mCalendar);
+            }
+            else {
+                //Show previous month
+                updateCalendar(false);
             }
 
-            mCuerrentPosition = position;
+            mCurrentPosition = position;*/
 
-            Log.d(TAG, "setUpViewPager: month: " + mCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, getResources().getConfiguration().locale));
+            //updateCalendar((Calendar)(mCalendarPagerAdapter.getItem(position)).getArguments().get(CALENDAR_KEY));
+            updateCalendar((Calendar)(mCalendarPagerAdapter.getRegisteredFragment(position)).getArguments().get(CALENDAR_KEY));
         }
 
         @Override

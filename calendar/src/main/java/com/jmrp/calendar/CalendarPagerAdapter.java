@@ -2,10 +2,17 @@ package com.jmrp.calendar;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
@@ -13,8 +20,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
 
+import static com.jmrp.calendar.CalendarItemView.CALENDAR_KEY;
 
-public class CalendarPagerAdapter extends PagerAdapter {
+
+public class CalendarPagerAdapter extends FragmentPagerAdapter {
     // This holds all the currently displayable views, in order from left to right.
     private ArrayList<CalendarItemView> mCalendarItemViews;
 
@@ -22,55 +31,94 @@ public class CalendarPagerAdapter extends PagerAdapter {
 
     private Calendar mCalendar;
 
-    public CalendarPagerAdapter(ArrayList<CalendarItemView> mCalendarItemViews) {
-        this.mCalendarItemViews = mCalendarItemViews;
-        //this.mCalendar = calendar;
+    private int mCurrentPosition = -1;
+
+    private ArrayList<Integer> positions = new ArrayList<>();
+
+    private SparseArray<Fragment> registeredFragments = new SparseArray<>();
+
+    public CalendarPagerAdapter(FragmentManager fragmentManager, Calendar calendar) {
+        super(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        this.mCalendar = calendar;
     }
 
-    //-----------------------------------------------------------------------------
-    // Used by ViewPager.  "Object" represents the page; tell the ViewPager where the
-    // page should be displayed, from left-to-right.  If the page no longer exists,
-    // return POSITION_NONE.
+
+    @NonNull
     @Override
-    public int getItemPosition (Object object)
-    {
-        int index = mCalendarItemViews.indexOf (object);
-        if (index == -1)
-            return POSITION_NONE;
-        else
-            return index;
-    }
+    public Fragment getItem(int position) {
 
-    //-----------------------------------------------------------------------------
-    // Used by ViewPager.  Called when ViewPager needs a page to display; it is our job
-    // to add the page to the container, which is normally the ViewPager itself.  Since
-    // all our pages are persistent, we simply retrieve it from our "views" ArrayList.
-    @Override
-    public Object instantiateItem (ViewGroup container, int position) {
-        //LayoutInflater inflater = LayoutInflater.from(container.getContext());
-        //CalendarItemView v = (CalendarItemView) inflater.inflate(R.layout.calendar_item, container, false);
+        //(CalendarItemView) getItem(mCurrentPosition-2).getArguments().get(CALENDAR_KEY)
+        Log.w(TAG, "getItem: position -> " + position);
+        Log.w(TAG, "getItem: positions size" + positions.size());
+        CalendarItemView calendarItemView;
+        if(mCurrentPosition!=-1){
+            if(position<=positions.get(0)-1){
+                //Calendar nextCalendar = Calendar.getInstance();
+                Calendar previousCalendar = Calendar.getInstance();
+                if(registeredFragments.size()>1 && getRegisteredFragment(positions.get(0)).getArguments()!=null){
+                    previousCalendar.setTime(((Calendar)getRegisteredFragment(positions.get(0)).getArguments().get(CALENDAR_KEY)).getTime());
+                }
+                else {
+                    previousCalendar = Calendar.getInstance();
+                }
+                Log.w(TAG, "getItem: mCalendar month -> " + mCalendar.get(Calendar.MONTH));
+                Log.w(TAG, "getItem: previousCalendar month ->" + previousCalendar.get(Calendar.MONTH));
 
-        CalendarItemView v = (CalendarItemView) mCalendarItemViews.get (position);
+                previousCalendar.set(Calendar.MONTH, previousCalendar.get(Calendar.MONTH)-1);
+                Log.w(TAG, "getItem: previousCalendar month2 -> " + previousCalendar.get(Calendar.MONTH));
+                Log.w(TAG, "getItem: mCalendar month2 -> " + mCalendar.get(Calendar.MONTH));
+                mCurrentPosition = position;
+                positions.add(0, position);
+                calendarItemView = CalendarItemView.newInstance(previousCalendar);
+                registeredFragments.put(position, calendarItemView);
+                return calendarItemView;
+            }
+            else {
+                //Pillar el calendar del fragment con position mas uno o menos uno y hacer uso de ese en lugar de el instance que por ejemplo apuntaria a junio y estamos creando abril
+                Calendar nextCalendar = Calendar.getInstance();
+                if(registeredFragments.size()==2){
+                    nextCalendar.setTime(((Calendar)getRegisteredFragment(position-1).getArguments().get(CALENDAR_KEY)).getTime());
+                }
+                else if(registeredFragments.size()>2 && registeredFragments.get(position-1)!=null && getRegisteredFragment(position-1).getArguments()!=null){
+                    nextCalendar.setTime(((Calendar)getRegisteredFragment(position-1).getArguments().get(CALENDAR_KEY)).getTime());
+                }
+                else {
+                    nextCalendar = Calendar.getInstance();
+                }
+                Log.w(TAG, "getItem: mCalendar month -> " + mCalendar.get(Calendar.MONTH));
+                Log.w(TAG, "getItem: nextCalendar month ->" + nextCalendar.get(Calendar.MONTH));
 
-        //v.init();
+                nextCalendar.set(Calendar.MONTH, nextCalendar.get(Calendar.MONTH)+1);
 
-        if(v.getParent() != null) {
-            ((ViewGroup)v.getParent()).removeView(v); // <- fix
+                Log.w(TAG, "getItem: mCalendar month2 -> " + mCalendar.get(Calendar.MONTH));
+                Log.w(TAG, "getItem: nextCalendar month2 -> " + nextCalendar.get(Calendar.MONTH));
+
+                mCurrentPosition = position;
+                positions.add(position);
+                calendarItemView = CalendarItemView.newInstance(nextCalendar);
+                registeredFragments.put(position, calendarItemView);
+                return calendarItemView;
+            }
         }
-
-        container.addView (v);
-        return v;
+        else {
+            mCurrentPosition = position;
+            positions.add(position);
+            Log.w(TAG, "getItem: mCalendar month -> " + mCalendar.get(Calendar.MONTH));
+            calendarItemView = CalendarItemView.newInstance(mCalendar);
+            registeredFragments.put(position, calendarItemView);
+            return calendarItemView;
+        }
     }
 
-    //-----------------------------------------------------------------------------
-    // Used by ViewPager.  Called when ViewPager no longer needs a page to display; it
-    // is our job to remove the page from the container, which is normally the
-    // ViewPager itself.  Since all our pages are persistent, we do nothing to the
-    // contents of our "views" ArrayList.
+    public Fragment getRegisteredFragment(int position) {
+        return registeredFragments.get(position);
+    }
+
     @Override
-    public void destroyItem (ViewGroup container, int position, Object object)
-    {
-        container.removeView (mCalendarItemViews.get (position));
+    public void destroyItem(ViewGroup container, int position, Object object) {
+        //registeredFragments.remove(position);
+        //positions.remove(position);
+        super.destroyItem(container, position, object);
     }
 
     //-----------------------------------------------------------------------------
@@ -78,25 +126,15 @@ public class CalendarPagerAdapter extends PagerAdapter {
     // Returns the total number of pages that the ViewPage can display.  This must
     // never be 0.
     @Override
-    public int getCount ()
-    {
-        return mCalendarItemViews.size();
-    }
-
-    //-----------------------------------------------------------------------------
-    // Used by ViewPager.
-    @Override
-    public boolean isViewFromObject (View view, Object object)
-    {
-        return view == object;
+    public int getCount () {
+        return Integer.MAX_VALUE;
     }
 
     //-----------------------------------------------------------------------------
     // Add "view" to right end of "views".
     // Returns the position of the new view.
     // The app should call this to add pages; not used by ViewPager.
-    public int addView (CalendarItemView v)
-    {
+    public int addView (CalendarItemView v) {
         return addView (v, mCalendarItemViews.size());
     }
 
@@ -115,8 +153,7 @@ public class CalendarPagerAdapter extends PagerAdapter {
     // Removes "view" from "views".
     // Retuns position of removed view.
     // The app should call this to remove pages; not used by ViewPager.
-    public int removeView (ViewPager pager, View v)
-    {
+    public int removeView (ViewPager pager, View v) {
         return removeView (pager, mCalendarItemViews.indexOf (v));
     }
 
@@ -138,17 +175,4 @@ public class CalendarPagerAdapter extends PagerAdapter {
 
         return position;
     }
-
-    //-----------------------------------------------------------------------------
-    // Returns the "view" at "position".
-    // The app should call this to retrieve a view; not used by ViewPager.
-    public View getView (int position)
-    {
-        return mCalendarItemViews.get (position);
-    }
-
-    // Other relevant methods:
-
-    // finishUpdate - called by the ViewPager - we don't care about what pages the
-    // pager is displaying so we don't use this method.
 }

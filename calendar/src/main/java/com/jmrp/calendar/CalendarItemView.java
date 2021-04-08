@@ -2,11 +2,15 @@ package com.jmrp.calendar;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+
+import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,55 +19,58 @@ import java.util.GregorianCalendar;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-public class CalendarItemView extends RelativeLayout {
+public class CalendarItemView extends Fragment {
 
     public static final String TAG = "CalendarFragmentView";
+    public static final String CALENDAR_KEY = "CALENDAR_KEY";
 
     private CalendarItemView rlMonthContainer;
     private CalendarMonthView gvContainerMonth;
     private Context mContext;
+    private int mCurrentMonth;
 
-    public CalendarItemView(Context context) {
-        super(context);
-        mContext = context;
+    // newInstance constructor for creating fragment with arguments
+    public static CalendarItemView newInstance(Calendar calendar) {
+        CalendarItemView fragmentFirst = new CalendarItemView();
+        Bundle args = new Bundle();
+        args.putSerializable(CALENDAR_KEY, calendar);
+        fragmentFirst.setArguments(args);
+        return fragmentFirst;
     }
 
-    public CalendarItemView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        mContext = context;
+    // Store instance variables based on arguments passed
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
-    public CalendarItemView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        mContext = context;
+    // Inflate the view for the fragment based on layout XML
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.calendar_item, container, false);
+        gvContainerMonth = view.findViewById(R.id.gvContainerMonth);
+
+        if(getArguments()!=null){
+            setUpCalendar((Calendar) getArguments().getSerializable(CALENDAR_KEY));
+        }
+        return view;
     }
 
-    public void init(){
+    /*public void init(){
         Random rnd = new Random();
         int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
         setBackgroundColor(color);
-    }
-
-    public void initViews(Context context){
-        //Inflate and attach your child XML
-        LayoutInflater.from(context).inflate(R.layout.calendar_item, this);
-        //Get a reference to the layout where you want children to be placed
-        gvContainerMonth = findViewById(R.id.gvContainerMonth);
-    }
+    }*/
 
     /**
      * Set up calendar
      */
     public void setUpCalendar(Calendar mCalendar) {
-
-        //Inflate and attach your child XML
-        LayoutInflater.from(mContext).inflate(R.layout.calendar_item, this);
-        //Get a reference to the layout where you want children to be placed
-        gvContainerMonth = findViewById(R.id.gvContainerMonth);
-
         //Log.d(TAG, "setUpCalendar: Current calendar month: " + mCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, getResources().getConfiguration().locale));
 
         Log.d(TAG, "setUpCalendar: Current date -> " + mCalendar.getTime());
+
+        mCurrentMonth = mCalendar.get(Calendar.MONTH);
 
         //Current month max days
         int currentMonthMaxDays = mCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -112,8 +119,11 @@ public class CalendarItemView extends RelativeLayout {
             mCalendar.add(Calendar.DAY_OF_MONTH, 1);
         }
 
+        //Restore to current month
+        if(mCurrentMonth!=mCalendar.get(Calendar.MONTH))
+            mCalendar.set(Calendar.MONTH, mCalendar.get(Calendar.MONTH)-1);
+
         //Sets month adapter
-        //CalendarMonthView calendarMonthView = findViewById(R.id.gvContainerMonth);
         gvContainerMonth.setAdapter(new CalendarDayAdapter(getContext(), calendarDays));
 
         //Sets click listener for each day in adapter and manage its  events

@@ -41,7 +41,7 @@ public final class CalendarDay implements Parcelable {
         this.mDay = day;
         this.mMonth = month;
         this.mYear = year;
-        Log.d(TAG, "CalendarDay: " + toString());
+        //Log.d(TAG, "CalendarDay: " + toString());
     }
 
 
